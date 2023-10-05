@@ -3,6 +3,7 @@ package com.example.tipcalculator
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -27,6 +28,7 @@ import com.example.tipcalculator.ui.theme.TipCalculatorTheme
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import java.text.NumberFormat
 
@@ -54,7 +56,11 @@ class MainActivity : ComponentActivity() {
     var amountInput by remember { mutableStateOf("") }
 
     val amount = amountInput.toDoubleOrNull() ?: 0.0
-    val tip = calculateTip(amount)
+
+
+    var tipInput by remember { mutableStateOf("") }
+    val percentage= tipInput.toDoubleOrNull() ?: 0.00
+    val tip = calculateTip(amount,percentage)
 
     Column(
             modifier = Modifier.padding(40.dp),
@@ -68,10 +74,28 @@ class MainActivity : ComponentActivity() {
                     .align(alignment = Alignment.Start)
             )
         EditNumberField(
+            label=R.string.bill_amount,
             value = amountInput,
             onValueChanged = { amountInput = it },
-            modifier = Modifier.padding(bottom = 32.dp).fillMaxWidth()
+            modifier = Modifier
+                .padding(bottom = 32.dp)
+                .fillMaxWidth(),
+            keyboardOptions= KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number,
+                imeAction = ImeAction.Next
+
+            )
+
         )
+        
+        EditNumberField(
+            label =R.string.how_was_the_service,
+            value =tipInput ,
+            onValueChanged ={tipInput=it} ,
+            modifier =Modifier
+                .padding(bottom=32.dp)
+                .fillMaxWidth(),
+            keyboardOptions=KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number,
+                imeAction = ImeAction.Done))
             Text(
                 text = stringResource(R.string.tip_amount, tip),
                 style = MaterialTheme.typography.displaySmall
@@ -84,24 +108,27 @@ class MainActivity : ComponentActivity() {
 @ExperimentalMaterial3Api
 @Composable
 fun EditNumberField(
+    @StringRes label: Int,
     value: String,
     onValueChanged: (String) -> Unit,
-    modifier: Modifier
+    modifier: Modifier,
+    keyboardOptions: KeyboardOptions
 ) {
     TextField(
         value = value,
         singleLine = true,
         modifier = modifier,
         onValueChange = onValueChanged,
-        label = { Text(stringResource(R.string.bill_amount)) },
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-    )
+        label = { Text(stringResource(label)) },
+        keyboardOptions = keyboardOptions)
+
+
 }
 
 
 
-private fun calculateTip(amount: Double, tipPercent: Double = 15.0): String {
-    val tip = tipPercent / 100 * amount
+private fun calculateTip(amount: Double, percentage: Double ): String {
+    val tip = percentage / 100 * amount
     return NumberFormat.getCurrencyInstance().format(tip)
 }
 
