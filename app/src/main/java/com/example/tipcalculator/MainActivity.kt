@@ -181,7 +181,7 @@ fun RoundOffTip(
 
 
 
-private fun calculateTip(amount: Double, percentage: Double ,roundUp: Boolean ): String {
+internal fun calculateTip(amount: Double, percentage: Double ,roundUp: Boolean ): String {
     var tip = percentage / 100 * amount
     if (roundUp) {
         tip = kotlin.math.ceil(tip)
